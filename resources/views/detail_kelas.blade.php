@@ -83,9 +83,9 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0" style="color: #1e293b;">Daftar Mahasiswa</h5>
-                        <button class="btn btn-primary px-4 py-2" style="border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none;">
-                            <i class="fas fa-plus me-2"></i>Tambah Mahasiswa
-                        </button>
+                        <button class="btn btn-primary px-4 py-2" ... data-bs-toggle="modal" data-bs-target="#tambahMahasiswaModal">
+    <i class="fas fa-plus me-2"></i>Tambah Mahasiswa
+</button>
                     </div>
                     
                     <div class="row g-3">
@@ -104,9 +104,17 @@
                                                 <small class="text-muted">NIM: {{ $student['nim'] }}</small>
                                             </div>
                                         </div>
-                                        <button class="btn btn-danger btn-sm px-4 py-2" style="border-radius: 20px;">
-                                            <i class="fas fa-trash me-1"></i>Hapus
-                                        </button>
+                                        <div class="card-body p-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <form action="{{ route('mahasiswa.hapus', ['course' => $course->id, 'student' => $student->id]) }}" method="POST" class="form-hapus">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger btn-sm px-3 py-2" style="border-radius: 20px;">
+                <i class="fas fa-trash me-1"></i>Hapus
+            </button>
+        </form>
+        </div>
+</div>
                                     </div>
                                 </div>
                             </div>
@@ -123,9 +131,9 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0" style="color: #1e293b;">Materi Pembelajaran</h5>
-                        <button class="btn btn-primary px-4 py-2" style="border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none;">
-                            <i class="fas fa-upload me-2"></i>Upload Materi
-                        </button>
+                        <button class="btn btn-primary px-4 py-2" ... data-bs-toggle="modal" data-bs-target="#uploadMateriModal">
+    <i class="fas fa-upload me-2"></i>Upload Materi
+</button>
                     </div>
                     
                     <div class="row g-3">
@@ -152,14 +160,25 @@
                                         </div>
                                         <div class="d-flex align-items-center">
                                             <span class="me-3 text-muted small">28 Download</span>
-                                            <div class="btn-group">
-                                                <button class="btn btn-warning btn-sm" style="border-radius: 8px 0 0 8px;">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-danger btn-sm" style="border-radius: 0 8px 8px 0;">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
+                                            <div class="d-flex align-items-center">
+    <span class="me-3 text-muted small"><a href="{{ asset('storage/' . $material->file_path) }}" target="_blank">Lihat File</a></span>
+    
+    <div class="btn-group">
+        <button class="btn btn-warning btn-sm edit-materi-btn" 
+                data-material-id="{{ $material->id }}" 
+                data-material-title="{{ $material->title }}" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editMateriModal" 
+                style="border-radius: 8px 0 0 8px;">
+            <i class="fas fa-edit"></i>
+        </button>
+        <form action="{{ route('materi.hapus', $material) }}" method="POST" class="form-hapus">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0 8px 8px 0;"><i class="fas fa-trash"></i></button>
+        </form>
+    </div>
+    </div>
                                         </div>
                                     </div>
                                 </div>
@@ -177,9 +196,9 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0" style="color: #1e293b;">Tugas & Ujian</h5>
-                        <button class="btn btn-primary px-4 py-2" style="border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none;">
-                            <i class="fas fa-plus me-2"></i>Buat Tugas
-                        </button>
+                        <button class="btn btn-primary px-4 py-2" ... data-bs-toggle="modal" data-bs-target="#buatTugasModal">
+    <i class="fas fa-plus me-2"></i>Buat Tugas
+</button>
                     </div>
                     
                     <div class="row g-3">
@@ -432,5 +451,128 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Script untuk modal edit materi
+    const editMateriModal = document.getElementById('editMateriModal');
+    // ... (logika js lainnya) ...
+
+    // Script untuk konfirmasi hapus
+    document.querySelectorAll('.form-hapus').forEach(form => {
+        // ... (logika js lainnya) ...
+    });
+});
 </script>
+@endpush
+</script>
+<div class="modal fade" id="tambahMahasiswaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Tambah Mahasiswa Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('mahasiswa.tambah', $course) }}" method="POST">
+                <div class="modal-body">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">NIM</label>
+                        <input type="text" name="nim" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadMateriModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Upload Materi Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('materi.upload', $course) }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Judul Materi</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pilih File (PDF, DOCX, PPTX, MP4, dll)</label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editMateriModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Edit Judul Materi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editMateriForm" method="POST">
+                <div class="modal-body">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label class="form-label">Judul Materi</label>
+                        <input type="text" name="title" id="editMateriTitle" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="buatTugasModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Buat Tugas Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('tugas.buat', $course) }}" method="POST">
+                <div class="modal-body">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Judul Tugas</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deskripsi (Opsional)</label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="datetime-local" name="deadline" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endpush
