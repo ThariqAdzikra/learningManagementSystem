@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Student;
+use App\Models\Material;
+use App\Models\Assignment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DosenController extends Controller
 {
@@ -23,26 +27,67 @@ class DosenController extends Controller
     }
 
     /**
-     * Menampilkan halaman detail kelas.
+     * Menampilkan halaman detail kelas dengan semua data terkait.
      */
     public function show(Course $course)
     {
-        // Data di bawah ini statis sebagai contoh.
-        $students = [
-            ['id' => 1, 'name' => 'Ahmad Rizki', 'nim' => '2021001'],
-            ['id' => 2, 'name' => 'Siti Nurhaliza', 'nim' => '2021002'],
-            ['id' => 3, 'name' => 'Budi Santoso', 'nim' => '2021003'],
-        ];
-        $materials = [
-            ['id' => 1, 'title' => 'Pengenalan Algoritma', 'type' => 'PDF', 'date' => '2024-01-15'],
-            ['id' => 2, 'title' => 'Struktur Kontrol', 'type' => 'Video', 'date' => '2024-01-22'],
-        ];
-        $grades = [
-            ['student_id' => 1, 'tugas1' => 85, 'uts' => 88],
-            ['student_id' => 2, 'tugas1' => 80, 'uts' => 85],
-            ['student_id' => 3, 'tugas1' => 75, 'uts' => 70],
-        ];
+        // Mengambil data dinamis dari relasi database
+        return view('detail_kelas', [
+            'course' => $course,
+            'students' => $course->students()->orderBy('name')->get(),
+            'materials' => $course->materials()->latest()->get(),
+            'assignments' => $course->assignments()->latest()->get(),
+            'grades' => [], // Data nilai bisa dikembangkan di sini
+        ]);
+    }
 
-        return view('detail_kelas', compact('course', 'students', 'materials', 'grades'));
+    // --- FITUR MAHASISWA ---
+    public function tambahMahasiswa(Request $request, Course $course)
+    {
+        $request->validate(['name' => 'required|string|max:255', 'nim' => 'required|string|max:255|unique:students,nim']);
+        $student = Student::create($request->all());
+        $course->students()->attach($student->id);
+        return back()->with('success', 'Mahasiswa berhasil ditambahkan!');
+    }
+
+    public function hapusMahasiswa(Course $course, Student $student)
+    {
+        $course->students()->detach($student->id);
+        return back()->with('success', 'Mahasiswa berhasil dihapus dari kelas.');
+    }
+
+    // --- FITUR MATERI ---
+    public function uploadMateri(Request $request, Course $course)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'file' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,mp4,mov|max:20480', // max 20MB
+        ]);
+        $file = $request->file('file');
+        $path = $file->store('materials', 'public');
+        $course->materials()->create(['title' => $request->title, 'file_path' => $path, 'file_type' => $file->getClientOriginalExtension()]);
+        return back()->with('success', 'Materi berhasil di-upload.');
+    }
+    
+    public function updateMateri(Request $request, Material $material)
+    {
+        $request->validate(['title' => 'required|string|max:255']);
+        $material->update(['title' => $request->title]);
+        return back()->with('success', 'Materi berhasil di-update.');
+    }
+
+    public function hapusMateri(Material $material)
+    {
+        Storage::disk('public')->delete($material->file_path);
+        $material->delete();
+        return back()->with('success', 'Materi berhasil dihapus.');
+    }
+
+    // --- FITUR TUGAS ---
+    public function buatTugas(Request $request, Course $course)
+    {
+        $request->validate(['title' => 'required|string|max:255', 'description' => 'nullable|string', 'deadline' => 'required|date']);
+        $course->assignments()->create($request->all());
+        return back()->with('success', 'Tugas berhasil dibuat.');
     }
 }

@@ -12,4 +12,16 @@ class Course extends Model
     protected $fillable = [
         'name', 'code', 'schedule', 'room', 'semester'
     ];
+    // ...
+public function students() {
+    return $this->belongsToMany(Student::class);
+}
+
+public function materials() {
+    return $this->hasMany(Material::class);
+}
+
+public function assignments() {
+    return $this->hasMany(Assignment::class);
+}
 }
