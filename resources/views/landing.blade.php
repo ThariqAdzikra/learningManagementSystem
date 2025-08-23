@@ -146,7 +146,8 @@
 </div>
 
 <div class="hero-section">
-    <h1>Your Smart Learning Companion</h1>
+    <h1>Your Smart Learning Companion halooo</h1>
+    <h2></h2>
     <p>SmartPal helps students and lecturers manage their learning and teaching activities seamlessly, all in one place.</p>
     <a href="{{ route('register') }}" class="btn btn-primary-custom">Get Started</a>
 </div>
