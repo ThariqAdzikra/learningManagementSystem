@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+ dashboard_dosen
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+main
 use Illuminate\Database\Eloquent\Model;
 
 class Assignment extends Model
 {
+
+}
+
     use HasFactory;
 
     protected $fillable = [
@@ -54,3 +60,4 @@ class Assignment extends Model
         return '<span class="badge pending">Pending</span>';
     }
 }
+ main

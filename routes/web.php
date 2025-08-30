@@ -1,7 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< Updated upstream
+ dashboard_dosen
+use App\Http\Controllers\DosenController;
+
+Route::get('/', fn() => redirect()->route('dosen.dashboard'));
+
+// Route untuk Halaman Utama
+Route::get('/dashboard-dosen', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
+Route::get('/kelas/{course}', [DosenController::class, 'show'])->name('dosen.kelas.show');
+
+// Routes untuk Aksi Mahasiswa
+Route::post('/kelas/{course}/mahasiswa', [DosenController::class, 'tambahMahasiswa'])->name('mahasiswa.tambah');
+Route::delete('/kelas/{course}/mahasiswa/{student}', [DosenController::class, 'hapusMahasiswa'])->name('mahasiswa.hapus');
+
+// Routes untuk Aksi Materi
+Route::post('/kelas/{course}/materi', [DosenController::class, 'uploadMateri'])->name('materi.upload');
+Route::put('/materi/{material}', [DosenController::class, 'updateMateri'])->name('materi.update');
+Route::delete('/materi/{material}', [DosenController::class, 'hapusMateri'])->name('materi.hapus');
+
+// Routes untuk Aksi Tugas
+Route::post('/kelas/{course}/tugas', [DosenController::class, 'buatTugas'])->name('tugas.buat');
+
+Updated upstream
 // Import semua controller yang dibutuhkan
 use App\Http\Controllers\DashboardMahasiswaController;
 use App\Http\Controllers\ClassController;
@@ -19,11 +40,11 @@ use App\Http\Controllers\AssignmentController;
 */
 =======
 use App\Http\Controllers\Auth\RegisterController; // Pastikan ini diimpor
->>>>>>> Stashed changes
+ Stashed changes
 
 // Rute untuk halaman Landing Page
 Route::get('/', function () {
-<<<<<<< Updated upstream
+Updated upstream
     return view('welcome');
 });
 
@@ -60,4 +81,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
->>>>>>> Stashed changes
+ Stashed changes
+ main
