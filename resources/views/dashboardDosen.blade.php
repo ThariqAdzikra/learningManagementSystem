@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartPal - Dashboard Mahasiswa</title>
+    <title>SmartPal - Dashboard Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -123,6 +123,17 @@
             box-shadow: 0 8px 32px var(--shadow-medium);
         }
 
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
         .welcome-content {
             display: flex;
             justify-content: space-between;
@@ -151,6 +162,20 @@
             line-height: 1.5;
         }
 
+        .welcome-icon {
+            background: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .welcome-icon i {
+            font-size: 5rem;
+            color: #fbbf24;
+            opacity: 0.8;
+        }
+
         /* Section Titles */
         .section-title {
             font-size: 24px;
@@ -160,7 +185,7 @@
             letter-spacing: -0.02em;
         }
 
-        /* ===== START: CSS UNTUK OVERVIEW ===== */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -212,9 +237,8 @@
             justify-content: center;
         }
 
-        .stat-icon svg {
-            width: 28px;
-            height: 28px;
+        .stat-icon i {
+            font-size: 28px;
             color: var(--primary-dark);
         }
 
@@ -231,8 +255,6 @@
             font-size: 16px;
             font-weight: 600;
         }
-
-        /* ===== END: CSS UNTUK OVERVIEW ===== */
 
         /* Courses Grid */
         .courses-grid {
@@ -288,6 +310,57 @@
             margin-right: 16px;
         }
 
+        .course-actions {
+            position: relative;
+        }
+
+        .course-actions .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 25px var(--shadow-medium);
+            border-radius: 12px;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 10px;
+            background-color: var(--white);
+            z-index: 10;
+            min-width: 150px;
+            display: none;
+            flex-direction: column;
+            padding: 8px 0;
+        }
+
+        .course-actions .dropdown-menu.show {
+            display: flex;
+        }
+
+        .course-actions .dropdown-menu .dropdown-item {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            display: block;
+            transition: background-color 0.2s;
+        }
+
+        .course-actions .dropdown-menu .dropdown-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .course-actions .dropdown-menu .dropdown-divider {
+            height: 1px;
+            margin: 8px 0;
+            background-color: var(--primary-light);
+        }
+
+        .course-actions .dropdown-menu .dropdown-item.text-danger {
+            color: #dc3545;
+        }
+
+        .course-actions .dropdown-menu .dropdown-item i {
+            margin-right: 8px;
+        }
+
         .course-info {
             display: flex;
             flex-direction: column;
@@ -312,6 +385,10 @@
             flex-shrink: 0;
         }
 
+        .course-detail-icon i {
+            font-size: 20px;
+        }
+
         .empty-state {
             background: var(--white);
             border-radius: 20px;
@@ -320,6 +397,35 @@
             box-shadow: 0 6px 24px var(--shadow-light);
             border: 1px solid rgba(200, 217, 230, 0.3);
             grid-column: 1 / -1;
+        }
+
+        .empty-state h5 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: var(--text-medium);
+            margin-bottom: 24px;
+        }
+
+        .empty-state button {
+            background: linear-gradient(135deg, var(--primary-medium), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         /* Footer */
@@ -337,7 +443,7 @@
             font-weight: 500;
         }
 
-        /* CSS UNTUK MODAL JOIN COURSE */
+        /* CSS UNTUK MODAL TAMBAH KELAS */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -368,6 +474,7 @@
             max-width: 500px;
             transform: scale(0.95);
             transition: transform 0.3s ease;
+            border: 1px solid var(--primary-light);
         }
 
         .modal-overlay.active .modal-content {
@@ -418,16 +525,25 @@
             color: var(--text-dark);
         }
 
-        .modal-form input[type="text"] {
+        .modal-form input[type="text"],
+        .modal-form textarea {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--primary-light);
             border-radius: 12px;
             font-size: 16px;
             transition: all 0.2s ease;
+            background-color: #fff;
+            font-family: inherit;
         }
 
-        .modal-form input[type="text"]:focus {
+        .modal-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-form input[type="text"]:focus,
+        .modal-form textarea:focus {
             outline: none;
             border-color: var(--primary-medium);
             box-shadow: 0 0 0 4px rgba(86, 124, 141, 0.2);
@@ -588,6 +704,18 @@
             transition: background-color 0.2s;
             flex-shrink: 0;
         }
+
+        /* Animasi untuk card */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -605,7 +733,7 @@
                 <h1>SmartPal</h1>
             </div>
             <div class="header-actions">
-                <button id="openModalBtn" class="header-btn" title="Gabung Kelas Baru">
+                <button id="openModalBtn" class="header-btn" title="Tambah Kelas Baru">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -641,99 +769,96 @@
                 <div class="welcome-content">
                     <div class="welcome-text">
                         <div class="welcome-date">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</div>
-                        <h2>Selamat Datang, {{ $mahasiswa->first_name }}</h2>
-                        <p>Waktunya upgrade dirimu lewat pembelajaran digital!</p>
+                        <h2>Selamat Pagi, {{ $dosen->name }}</h2>
+                        <p>Semangat mengajar dan membimbing mahasiswa hari ini!</p>
+                    </div>
+                    <div class="welcome-icon">
+                        <i class="fas fa-sun"></i>
                     </div>
                 </div>
             </section>
 
-            {{-- ===== START: BAGIAN OVERVIEW YANG DIKEMBALIKAN ===== --}}
             <section>
                 <h3 class="section-title">Overview</h3>
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card fade-in-up">
                         <div class="stat-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-book-fill" viewBox="0 0 16 16">
-                                <path
-                                    d="M8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783" />
-                            </svg>
+                            <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        <h3>{{ $stats['materi'] }}</h3>
-                        <p>Materi</p>
+                        <h3>{{ $stats['classCount'] }}</h3>
+                        <p>Kelas</p>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card fade-in-up">
                         <div class="stat-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-list-task" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5zM3 3H2v1h1z" />
-                                <path
-                                    d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1z" />
-                                <path fill-rule="evenodd"
-                                    d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5zM2 7h1v1H2zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm1 .5H2v1h1z" />
-                            </svg>
+                            <i class="fas fa-users"></i>
                         </div>
-                        <h3>{{ $stats['tugas'] }}</h3>
+                        <h3>{{ $stats['studentCount'] }}</h3>
+                        <p>Mahasiswa</p>
+                    </div>
+                    <div class="stat-card fade-in-up">
+                        <div class="stat-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>{{ $stats['assignmentCount'] }}</h3>
                         <p>Tugas</p>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-clipboard-fill" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2" />
-                            </svg>
-                        </div>
-                        <h3>{{ $stats['ujian'] }}</h3>
-                        <p>Ujian</p>
                     </div>
                 </div>
             </section>
-            {{-- ===== END: BAGIAN OVERVIEW YANG DIKEMBALIKAN ===== --}}
 
             <section>
                 <h3 class="section-title">My Course</h3>
                 <div class="courses-grid">
-                    @forelse($courses as $course)
-                        <a href="{{ route('mahasiswa.kelas.show', $course->id) }}"
-                            style="text-decoration: none; color: inherit;">
-                            <div class="course-card">
-                                <div class="course-header">
-                                    <h4 class="course-title">{{ $course->name }}</h4>
-                                </div>
-                                <div class="course-info">
-                                    <div class="course-detail">
-                                        <span class="course-detail-icon">
-                                            <i class="fas fa-chalkboard-teacher"></i>
-                                        </span>
-                                        <span>Dosen: {{ $course->dosen->first_name ?? 'N/A' }}</span>
-                                    </div>
-                                    <div class="course-detail">
-                                        <span class="course-detail-icon">
-                                            <i class="fas fa-book-open"></i>
-                                        </span>
-                                        <span>{{ $course->materials_count }} Materi</span>
-                                    </div>
-                                    <div class="course-detail">
-                                        <span class="course-detail-icon">
-                                            <i class="fas fa-tasks"></i>
-                                        </span>
-                                        <span>{{ $course->assignments_count }} Tugas</span>
-                                    </div>
-                                </div>
-                                <div style="margin-top: 24px;">
-                                    <span
-                                        style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--primary-light), var(--accent-cream)); color: var(--text-dark); text-align: center; text-decoration: none; font-weight: 600; display: block;">
-                                        Buka Kelas
-                                    </span>
+                    @forelse ($courses as $course)
+                        <div class="course-card fade-in-up">
+                            <div class="course-header">
+                                <h4 class="course-title">{{ $course->name }}</h4>
+                                <div class="course-actions">
+                                    <button class="header-btn" aria-haspopup="true" aria-expanded="false"
+                                        onclick="toggleDropdown(this)">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit Kelas</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>Detail Kelas</a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i
+                                                    class="fas fa-trash me-2"></i>Hapus</a></li>
+                                    </ul>
                                 </div>
                             </div>
-                        </a>
+                            <div class="course-info">
+                                <div class="course-detail">
+                                    <span class="course-detail-icon"><i class="fas fa-book"></i></span>
+                                    <span>Kode Join: {{ $course->code }}</span>
+                                </div>
+                                <div class="course-detail">
+                                    <span class="course-detail-icon"><i class="fas fa-users"></i></span>
+                                    <span>{{ $course->students_count }} Mahasiswa</span>
+                                </div>
+                                <div class="course-detail">
+                                    <span class="course-detail-icon"><i class="fas fa-clock"></i></span>
+                                    <span>{{ $course->schedule ?? 'Belum diatur' }}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 24px;">
+                                <a href="{{ route('dosen.kelas.show', $course) }}"
+                                    style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--primary-light), var(--accent-cream)); color: var(--text-dark); text-align: center; text-decoration: none; font-weight: 600; display: block; transition: all 0.3s ease;">
+                                    Buka Kelas
+                                </a>
+                            </div>
+                        </div>
                     @empty
-                        <div class="empty-state">
-                            <h5>Anda Belum Bergabung Kelas Apapun</h5>
-                            <p>Gunakan token dari dosen Anda untuk bergabung ke kelas baru.</p>
+                        <div class="empty-state fade-in-up">
+                            <div style="margin-bottom: 16px;">
+                                <i class="fas fa-chalkboard-teacher" style="font-size: 4rem; color: #cbd5e1;"></i>
+                            </div>
+                            <h5>Anda Belum Memiliki Kelas</h5>
+                            <p>Tambahkan kelas baru untuk memulai mengajar.</p>
+                            <button id="addCourseBtn" type="button"><i class="fas fa-plus me-2"></i> Tambah Kelas Baru</button>
                         </div>
                     @endforelse
                 </div>
@@ -741,25 +866,40 @@
         </main>
 
         <footer class="footer">
-            <p>© 2025 Dikembangkan dengan senyuman, oleh SmartPal group.</p>
+            <p>&copy; 2025 Dikembangkan dengan senyuman, oleh SmartPal group.</p>
         </footer>
 
-        <div id="joinCourseModal" class="modal-overlay">
+        <div id="addCourseModal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Gabung Kelas Baru 🎓</h3>
+                    <h3>Tambah Kelas Baru ✨</h3>
                     <button id="closeModalBtn" class="close-btn">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p>Masukkan kode unik (token) yang diberikan oleh dosen Anda untuk bergabung ke dalam kelas.</p>
-                    <form action="{{ route('mahasiswa.kelas.join') }}" method="POST" class="modal-form" id="joinCourseForm">
+                    <p>Isi informasi di bawah ini. Kode kelas untuk mahasiswa akan dibuat secara otomatis.</p>
+
+                    {{-- PERBAIKAN: Nama route disesuaikan dengan web.php --}}
+                    <form action="{{ route('dosen.kelas.store') }}" method="POST" class="modal-form" id="addCourseForm">
                         @csrf
                         <div class="form-group">
-                            <label for="code">Kode Kelas (Token)</label>
-                            <input type="text" id="code" name="code" placeholder="Contoh: A1B2C3D4" required
-                                autocomplete="off" minlength="8" maxlength="8">
+                            <label for="name">Nama Kelas</label>
+                            <input type="text" id="name" name="name" placeholder="Contoh: Pemrograman Web Lanjut" required
+                                autocomplete="off">
                         </div>
-                        <button type="submit" class="submit-btn">Gabung Kelas</button>
+
+                        <div class="form-group">
+                            <label for="schedule">Jadwal (Opsional)</label>
+                            <input type="text" id="schedule" name="schedule" placeholder="Contoh: Senin, 10:00 - 12:00"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Deskripsi (Opsional)</label>
+                            <textarea id="description" name="description"
+                                placeholder="Deskripsi singkat mengenai mata kuliah ini..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Buat Kelas</button>
                     </form>
                 </div>
             </div>
@@ -789,7 +929,7 @@
                 </div>
                 <div id="chatbot-body" class="chatbot-body">
                     <div class="message bot">
-                        <p>Halo {{ $mahasiswa->first_name }}! Ada yang bisa saya bantu?</p>
+                        <p>Halo {{ $dosen->name }}! Ada yang bisa saya bantu?</p>
                     </div>
                 </div>
                 <div class="chatbot-footer">
@@ -802,33 +942,74 @@
                 </div>
             </div>
         </div>
+    @endsection
 
+    @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // --- LOGIKA UNTUK MODAL JOIN COURSE ---
-                const openModalBtn = document.getElementById('openModalBtn');
-                const closeModalBtn = document.getElementById('closeModalBtn');
-                const joinCourseModal = document.getElementById('joinCourseModal');
-
-                if (openModalBtn) {
-                    openModalBtn.addEventListener('click', () => {
-                        if (joinCourseModal) joinCourseModal.classList.add('active');
+                // --- LOGIKA UTAMA & ANIMASI ---
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        }
                     });
+                }, {
+                    threshold: 0.1
+                });
+                document.querySelectorAll('.stat-card, .course-card, .empty-state').forEach(card => {
+                    card.classList.add('fade-in-up');
+                    observer.observe(card);
+                });
+
+                // --- LOGIKA UNTUK MODAL TAMBAH KELAS ---
+                const openModalBtn = document.getElementById('openModalBtn');
+                const addCourseBtn = document.getElementById('addCourseBtn');
+                const closeModalBtn = document.getElementById('closeModalBtn');
+                const addCourseModal = document.getElementById('addCourseModal');
+
+                function openModal() {
+                    if (addCourseModal) {
+                        addCourseModal.classList.add('active');
+                    }
                 }
+
+                if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+                if (addCourseBtn) addCourseBtn.addEventListener('click', openModal);
+
                 if (closeModalBtn) {
                     closeModalBtn.addEventListener('click', () => {
-                        if (joinCourseModal) joinCourseModal.classList.remove('active');
+                        addCourseModal.classList.remove('active');
                     });
                 }
-                if (joinCourseModal) {
-                    joinCourseModal.addEventListener('click', (event) => {
-                        if (event.target === joinCourseModal) {
-                            joinCourseModal.classList.remove('active');
+                if (addCourseModal) {
+                    addCourseModal.addEventListener('click', (event) => {
+                        if (event.target === addCourseModal) {
+                            addCourseModal.classList.remove('active');
                         }
                     });
                 }
 
-                // --- LOGIKA JAVASCRIPT CHATBOT ---
+                // --- LOGIKA UNTUK DROPDOWN MENU DI CARD KELAS ---
+                window.toggleDropdown = function (element) {
+                    const dropdownMenu = element.nextElementSibling;
+                    const allDropdowns = document.querySelectorAll('.dropdown-menu');
+                    allDropdowns.forEach(menu => {
+                        if (menu !== dropdownMenu) {
+                            menu.classList.remove('show');
+                        }
+                    });
+                    dropdownMenu.classList.toggle('show');
+                }
+                document.addEventListener('click', function (event) {
+                    if (!event.target.closest('.course-actions')) {
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            menu.classList.remove('show');
+                        });
+                    }
+                });
+
+                // --- LOGIKA UNTUK CHATBOT ---
                 const chatOpenButton = document.getElementById('chat-open-button');
                 const chatbotWindow = document.getElementById('chatbot-window');
                 const chatOpenIcon = document.getElementById('chat-open-icon');
@@ -889,13 +1070,13 @@
 
                 const getBotResponse = (userInput) => {
                     const lowerInput = userInput.toLowerCase();
-                    let botReply = "Maaf, saya belum mengerti pertanyaan itu. Coba tanya tentang 'materi' atau 'tugas'.";
-                    if (lowerInput.includes('kelas') || lowerInput.includes('course')) {
-                        botReply = "Anda dapat melihat semua kelas yang Anda ikuti di halaman ini. Untuk bergabung ke kelas baru, klik tombol '+' di kanan atas.";
+                    let botReply = "Maaf, saya belum mengerti pertanyaan itu. Coba tanya tentang 'kelas' atau 'mahasiswa'.";
+                    if (lowerInput.includes('kelas')) {
+                        botReply = "Tentu, Anda bisa melihat semua daftar kelas yang Anda ajar di bagian 'My Course'. Anda juga bisa menambah kelas baru di sana.";
+                    } else if (lowerInput.includes('mahasiswa')) {
+                        botReply = "Anda bisa melihat jumlah total mahasiswa yang Anda ajar di bagian 'Overview' atau per kelas di halaman detail kelas.";
                     } else if (lowerInput.includes('tugas')) {
-                        botReply = "Untuk melihat daftar tugas, silakan buka halaman detail kelas. Di sana Anda akan menemukan semua tugas yang perlu dikerjakan beserta tenggat waktunya.";
-                    } else if (lowerInput.includes('materi')) {
-                        botReply = "Materi pelajaran tersedia di dalam setiap halaman detail kelas. Silakan pilih mata kuliah untuk melihat semua materinya.";
+                        botReply = "Untuk mengelola tugas, silakan masuk ke halaman detail kelas, lalu navigasi ke bagian 'Tugas'.";
                     } else if (lowerInput.includes('terima kasih') || lowerInput.includes('makasih')) {
                         botReply = "Sama-sama! Senang bisa membantu.";
                     }
@@ -903,7 +1084,7 @@
                 }
             });
         </script>
-    @endsection
+    @endpush
 </body>
 
 </html>

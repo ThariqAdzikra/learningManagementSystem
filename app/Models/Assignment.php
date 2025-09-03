@@ -2,37 +2,17 @@
 
 namespace App\Models;
 
- dashboard_dosen
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-main
 use Illuminate\Database\Eloquent\Model;
 
 class Assignment extends Model
 {
-
-}
-
     use HasFactory;
 
-    protected $fillable = [
-        'classroom_id',
-        'title',
-        'description',
-        'type',
-        'due_date',
-        'created_date',
-        'score',
-        'is_completed'
-    ];
+    protected $fillable = ['course_id', 'title', 'description', 'deadline', 'type', 'is_completed', 'due_date'];
+    // Tambahkan field sesuai tabel di database
 
-    protected $casts = [
-        'due_date' => 'datetime',
-        'created_date' => 'datetime',
-        'is_completed' => 'boolean'
-    ];
-
-    public function classroom()
+    public function course()
     {
         return $this->belongsTo(ClassRoom::class);
     }
@@ -43,7 +23,7 @@ class Assignment extends Model
             'tugas' => '📝',
             'quiz' => '❓',
             'materi' => '📚',
-            default => '📋'
+            default => '📋',
         };
     }
 
@@ -60,4 +40,3 @@ class Assignment extends Model
         return '<span class="badge pending">Pending</span>';
     }
 }
- main

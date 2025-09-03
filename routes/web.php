@@ -1,85 +1,56 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
- dashboard_dosen
-use App\Http\Controllers\DosenController;
 
-Route::get('/', fn() => redirect()->route('dosen.dashboard'));
-
-// Route untuk Halaman Utama
-Route::get('/dashboard-dosen', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
-Route::get('/kelas/{course}', [DosenController::class, 'show'])->name('dosen.kelas.show');
-
-// Routes untuk Aksi Mahasiswa
-Route::post('/kelas/{course}/mahasiswa', [DosenController::class, 'tambahMahasiswa'])->name('mahasiswa.tambah');
-Route::delete('/kelas/{course}/mahasiswa/{student}', [DosenController::class, 'hapusMahasiswa'])->name('mahasiswa.hapus');
-
-// Routes untuk Aksi Materi
-Route::post('/kelas/{course}/materi', [DosenController::class, 'uploadMateri'])->name('materi.upload');
-Route::put('/materi/{material}', [DosenController::class, 'updateMateri'])->name('materi.update');
-Route::delete('/materi/{material}', [DosenController::class, 'hapusMateri'])->name('materi.hapus');
-
-// Routes untuk Aksi Tugas
-Route::post('/kelas/{course}/tugas', [DosenController::class, 'buatTugas'])->name('tugas.buat');
-
-Updated upstream
-// Import semua controller yang dibutuhkan
-use App\Http\Controllers\DashboardMahasiswaController;
-use App\Http\Controllers\ClassController;
-use App\Http\Controllers\AssignmentController;
+// Import semua controller yang akan kita gunakan
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CourseController;
+use App\Http\Middleware\RoleMiddleware;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
-=======
-use App\Http\Controllers\Auth\RegisterController; // Pastikan ini diimpor
- Stashed changes
-
-// Rute untuk halaman Landing Page
+// Halaman Landing Page
 Route::get('/', function () {
-Updated upstream
-    return view('welcome');
-});
-
-// Route untuk dashboard mahasiswa (sudah ada sebelumnya)
-Route::get('/dashboardMahasiswa', [DashboardMahasiswaController::class, 'index'])->name('dashboard.mahasiswa');
-
-
-// --- ROUTE BARU ANDA ---
-
-// Route untuk menampilkan halaman detail kelas berdasarkan ID
-// Contoh URL: /kelas/1
-Route::get('/kelas/{id}', [ClassController::class, 'show'])->name('kelas.show');
-
-// Route untuk menandai tugas sebagai selesai
-// Ini dibutuhkan oleh form di dalam halaman kelas
-// PERBAIKAN: Mengganti } dengan ; di akhir baris ini
-Route::patch('/assignments/{id}/complete', [AssignmentController::class, 'markCompleted'])->name('assignments.complete');
-=======
     return view('landing');
 })->name('landing');
 
-// Rute untuk halaman Login
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
+// Grup Rute Tamu
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
+});
 
-// Rute untuk menampilkan form register
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-
-// Rute untuk memproses form register
-Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
-
+// Grup Rute yang Membutuhkan Login
 Route::middleware('auth')->group(function () {
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+
+    // -- RUTE KHUSUS UNTUK DOSEN --
+    Route::middleware([RoleMiddleware::class . ':dosen'])->prefix('dosen')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'dosenDashboard'])->name('dosen.dashboard');
+        Route::get('/kelas/{course}', [CourseController::class, 'showDosen'])->name('dosen.kelas.show');
+
+        // --- Rute untuk menyimpan kelas baru dari form modal ---
+        Route::post('/kelas', [CourseController::class, 'store'])->name('dosen.kelas.store');
+    });
+
+    // -- RUTE KHUSUS UNTUK MAHASISWA --
+    Route::middleware([RoleMiddleware::class . ':mahasiswa'])->prefix('mahasiswa')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'mahasiswaDashboard'])->name('mahasiswa.dashboard');
+        Route::get('/kelas/{course}', [CourseController::class, 'showMahasiswa'])->name('mahasiswa.kelas.show');
+
+        // Rute untuk memproses permintaan gabung kelas
+        Route::post('/kelas/join', [CourseController::class, 'join'])->name('mahasiswa.kelas.join');
+    });
 });
- Stashed changes
- main
+

@@ -5,21 +5,21 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
+    public function up(): void
     {
-        Schema::create('classrooms', function (Blueprint $table) {
+        Schema::create('courses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('dosen_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
-            $table->string('code')->unique();
-            $table->string('teacher');
+            $table->string('code', 8)->unique();
+            $table->string('schedule')->nullable();
             $table->text('description')->nullable();
-            $table->string('color')->default('#567C8D');
             $table->timestamps();
         });
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('classrooms');
+        Schema::dropIfExists('courses');
     }
 };
